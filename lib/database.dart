@@ -3,16 +3,12 @@ import 'package:sqflite/sqflite.dart';
 import 'package:todo/models.dart';
 
 class Sqflite {
-  static Database? _db;
-  Future<Database?> get db async {
-    if (_db == null) {
-      _db = await initDB();
-      return _db;
-    } else {
-      return _db;
-    }
+ Database? database;
+  Future getDatabase() async {
+    if (database != null) return database;
+    database = await initDB();
+    return database;
   }
-
   initDB() async {
     String databasepath = await getDatabasesPath();
     String path = join(databasepath, 'aya.db');
@@ -34,16 +30,16 @@ CREATE TABLE notes
     return mydb;
   }
     Future insertnote(Note note) async {
-    Database? mydb =await db;
-    Batch batch = mydb!.batch();
+    Database mydb =await getDatabase();
+    Batch batch = mydb.batch();
     batch.insert("notes", note.tomap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
     batch.commit();
   }
 
  Future<List<Map>> getFromNote() async {
-    Database? mydb= await db;
-    List<Map> mp = await mydb!.query("notes");
+    Database mydb= await getDatabase();
+    List<Map> mp = await mydb.query("notes");
     return List.generate(mp.length, (index) {
       return Note(
               content: mp[index]['content'],
@@ -52,13 +48,14 @@ CREATE TABLE notes
           .tomap();
     });
   }
+
   Future UpdateFromNote(Note note) async {
-    Database? mydb = await db;
-    await mydb!.update('notes', note.tomap(), where: "id=?", whereArgs: [note.id]);
+    Database mydb = await getDatabase();
+    await mydb.update('notes', note.tomap(), where: "id=?", whereArgs: [note.id]);
   }
 
    Future deletnote(int id) async {
-    Database? mydb = await db;
-    await mydb!.delete("notes", where: "id=?", whereArgs: [id]);
+    Database mydb = await getDatabase();
+    await mydb.delete("notes", where: "id=?", whereArgs: [id]);
   }
 }

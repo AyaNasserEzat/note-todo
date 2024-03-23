@@ -25,19 +25,23 @@ class _HomePageState extends State<HomePage> {
         child: FutureBuilder(
           future: Sqflite().getFromNote(),
           builder: (context, snapshot) {
-            return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, indx) {
-                  return Card(
-                    child: Column(
-                      children: [
-                        Text(snapshot.data![indx]['id']),
-                        Text(snapshot.data![indx]['title']),
-                        Text(snapshot.data![indx]['content']),
-                      ],
-                    ),
-                  );
-                });
+            if (snapshot.hasData &&snapshot.connectionState == ConnectionState.done ) {
+  return  ListView.builder(
+      itemCount: snapshot.data!.length,
+      itemBuilder: (context, indx) {
+        return Card(
+          child: Column(
+            children: [
+              Text('id:  ${snapshot.data![indx]['id'].toString()}'),
+              Text(' title ${snapshot.data![indx]['title']}'),
+              Text('content: ${snapshot.data![indx]['content']}'),
+            ],
+          ),
+        );
+      
+      });
+            
+}else{return Card(child: Text('heloo'),);}
           },
         ),
       ),
@@ -70,6 +74,7 @@ class _HomePageState extends State<HomePage> {
                       CupertinoDialogAction(
                         child: Text("add"),
                         onPressed: () async {
+                          Sqflite().insertnote(Note(content: contentcontroller.text, title: titlecontroller.text));
                           titlecontroller.clear();
                           contentcontroller.clear();
                           ;
