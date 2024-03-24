@@ -22,4 +22,11 @@ class ToDo{
   factory ToDo.fromJson(jsonData){
     return ToDo(title: jsonData['title']);
   }
+  Map<String,dynamic> tomap(){
+    return {
+      "id":id,
+      "title":title,
+      "value":value
+    };
+   }
 }
